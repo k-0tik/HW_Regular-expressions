@@ -12,11 +12,11 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
 # ваш код
 new_contacts_list = []
 
-phone_pattern = r"(\+7|8)?\s*\((\d{3,5})\)\s*(\d{1,3})[-\s]?(\d{2})[-\s]?(\d{2})(\s\(?"'доб'"\.\s\d{3,5}\)?)?"
-replacement_phone_pattern = r"8-\2-\3-\4-\5\6"
+phone_pattern = r"(\+7|8)?[-\s]*\(?(\d{3,5})\)?[-\s]*(\d{1,3})[-\s]*(\d{2})[-\s]*(\d{2})(\s*\(?доб\.?\s*\d{3,5}\)?)?"
+replacement_phone_pattern = r"+7(\2)\3-\4-\5\6"
 
 
-for row in contacts_list:
+for row in contacts_list[1:]:
     lastname = row[0]
     firstname = row[1]
     surname = row[2]
