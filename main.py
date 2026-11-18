@@ -12,8 +12,8 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
 # ваш код
 new_contacts_list = []
 
-phone_pattern = r"(\+7|8)?[-\s]*\(?(\d{3,5})\)?[-\s]*(\d{1,3})[-\s]*(\d{2})[-\s]*(\d{2})(\s*\(?доб\.?\s*\d{3,5}\)?)?"
-replacement_phone_pattern = r"+7(\2)\3-\4-\5\6"
+phone_pattern = r"(\+7|8)?[-\s]*\(?(\d{3,5})\)?[-\s]*(\d{1,3})[-\s]*(\d{2})[-\s]*(\d{2})[-\s](\(?доб\.?\s*\d{3,5}\)?)?"
+replacement_phone_pattern = r"+7(\2)\3-\4-\5 \6"
 
 
 for row in contacts_list[1:]:
@@ -44,10 +44,25 @@ for row in contacts_list[1:]:
     data = [new_lastname, new_firstname, new_surname, organization, position, cleaned_phones, email]
     new_contacts_list.append(data)
 
+# Тут нужно придумать как отфильтровать данные
+    
+contacts_dict = {}
+    
+for employee in new_contacts_list:
+    if employee[0] != '' and employee[1] != '' and employee[2] != '':
+        full_name = (employee[0], employee[1])
+    if full_name not in contacts_dict:
+        contacts_dict[full_name] = employee
+    else:
+        old_employee = contacts_dict[full_name]
+        for i in range(len(employee)):
+            if old_employee[i] == '':
+                old_employee[i] = employee[i]
+
 
 # TODO 2: сохраните получившиеся данные в другой файл
 # код для записи файла в формате CSV
 with open("phonebook.csv", "w", encoding="utf-8") as f:
   datawriter = csv.writer(f, delimiter=',')
   # Вместо contacts_list подставьте свой список
-  datawriter.writerows(new_contacts_list)
+  datawriter.writerows(contacts_dict.values())
