@@ -12,36 +12,28 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
 # ваш код
 new_contacts_list = []
 
-phone_pattern = r"(\+7|8)?[-\s]*\(?(\d{3,5})\)?[-\s]*(\d{1,3})[-\s]*(\d{2})[-\s]*(\d{2})[-\s](\(?доб\.?\s*\d{3,5}\)?)?"
-replacement_phone_pattern = r"+7(\2)\3-\4-\5 \6"
+phone_pattern = r"(\+7|8)[-\s]*\(?(\d{3,5}?)\)?[-\s]*(\d{1,3})[-\s]*(\d{2})[-\s]*(\d{2})(?:([-\s])*\(?(доб\.)?\s*(\d{3,5})?)?\)?"
+replacement_phone_pattern = r"+7(\2)\3-\4-\5\6\7\8"
+# Попробовала сделать необязательные группы через ?(: ), так в конце ничего не добавляется
 
 
 for row in contacts_list[1:]:
-    lastname = row[0]
-    firstname = row[1]
-    surname = row[2]
-    if lastname:
-        new_lastname = lastname.split(" ")[0]
-    if firstname:
-        new_firstname = firstname.split(" ")[0]
-    elif len(lastname.split(" ")) > 1:
-        new_firstname = lastname.split(" ")[1]
-    else:
-        new_firstname = ''
-    if surname:
-        new_surname = surname.split(" ")[0]
-    elif len(firstname.split(" ")) > 1:
-        new_surname = firstname.split(" ")[1]
-    elif len(lastname.split(" ")) > 2:
-        new_surname = lastname.split(" ")[2]
-    else:
-        new_surname = ''
+    fio = " ".join(row[:3]).split()
+    lastname, firstname, surname = fio[0], fio[1], fio[2] if len(fio) > 2 else ''
+# #  Расписала сокращенный вариант, чтобы понять что сокращается
+#     for _ in fio:
+#         if len(fio) > 2:
+#             lastname = fio[0]
+#             firstname = fio[1]
+#             surname = fio[2]
+#         else:
+#             surname = ''
     organization = row[3]
     position = row[4]
     phone = row[5]
     cleaned_phones = re.sub(phone_pattern, replacement_phone_pattern, phone)
     email = row[6]
-    data = [new_lastname, new_firstname, new_surname, organization, position, cleaned_phones, email]
+    data = [lastname, firstname, surname, organization, position, cleaned_phones, email]
     new_contacts_list.append(data)
 
 # Тут нужно придумать как отфильтровать данные
@@ -49,7 +41,7 @@ for row in contacts_list[1:]:
 contacts_dict = {}
     
 for employee in new_contacts_list:
-    if employee[0] != '' and employee[1] != '' and employee[2] != '':
+    if employee[0] != '' and employee[1] != '':
         full_name = (employee[0], employee[1])
     if full_name not in contacts_dict:
         contacts_dict[full_name] = employee
@@ -65,4 +57,5 @@ for employee in new_contacts_list:
 with open("phonebook.csv", "w", encoding="utf-8") as f:
   datawriter = csv.writer(f, delimiter=',')
   # Вместо contacts_list подставьте свой список
+  datawriter.writerow(contacts_list[0])
   datawriter.writerows(contacts_dict.values())
